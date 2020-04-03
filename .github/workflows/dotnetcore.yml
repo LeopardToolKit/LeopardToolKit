@@ -23,5 +23,5 @@ jobs:
     - name: Build
       run: dotnet build src/LeopardToolKit/LeopardToolKit.csproj --configuration Release --no-restore
     - name: Test
-      run: dotnet test src/LeopardToolKit/*Test.csproj --no-restore --verbosity normal
+      run: dotnet test src/LeopardToolKit/LeopardToolKit.csproj --no-restore --verbosity normal
 
