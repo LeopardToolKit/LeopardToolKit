@@ -19,9 +19,18 @@ jobs:
       with:
         dotnet-version: 3.1.101
     - name: Install dependencies
-      run: dotnet restore src/LeopardToolKit/LeopardToolKit.csproj
+      run: dotnet restore src/LeopardToolKit.sln
     - name: Build
-      run: dotnet build src/LeopardToolKit/LeopardToolKit.csproj --configuration Release --no-restore
+      run: dotnet build src/LeopardToolKit.sln --configuration Release --no-restore
     - name: Test
       run: dotnet test src/LeopardToolKit/LeopardToolKit.csproj --no-restore --verbosity normal
+      
+    - name: Publish NuGet
+      uses: rohith/publish-nuget@v2.2.1
+      with:
+        PROJECT_FILE_PATH: src/LeopardToolKit/LeopardToolKit.csproj
+        TAG_COMMIT: false
+        VERSION_FILE_PATH: src/LeopardToolKit/LeopardToolKit.csproj
+        VERSION_REGEX: <Version>(.*)<\/Version>
+        NUGET_KEY: ${{ secrets.NugetKey }} 
 
