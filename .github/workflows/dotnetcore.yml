@@ -17,6 +17,8 @@ jobs:
       run: ls
     - name: open src folder
       run: cd src
+    - name: ls
+      run: ls
     - name: open LeopardToolKit
       run: cd LeopardToolKit
 
