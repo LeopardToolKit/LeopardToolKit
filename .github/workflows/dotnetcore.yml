@@ -13,7 +13,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      
+    - name: open source folder
+      run: cd src
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
@@ -25,10 +26,10 @@ jobs:
     - name: Test
       run: dotnet test --no-restore --verbosity normal
     - name: Publish NuGet
-      uses: rohith/publish-nuget@v2.2.1
-      with: 
+     # uses: rohith/publish-nuget@v2.2.1
+     # with: 
     # Filepath of the project to be packaged, relative to root of repository
-        PROJECT_FILE_PATH: src/*.csproj
+        #PROJECT_FILE_PATH: src/*.csproj
     # Filepath containing version info, relative to root of repository. Defaults to `PROJECT_FILE_PATH` if not specified
     #VERSION_FILE_PATH: # optional
     # Regex (with version in a capturing group) to extract the version from `VERSION_FILE_PATH`
