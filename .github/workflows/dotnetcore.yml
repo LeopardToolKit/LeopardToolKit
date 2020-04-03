@@ -13,12 +13,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: ls
+      run: ls
     - name: open src folder
       run: cd src
     - name: open LeopardToolKit
       run: cd LeopardToolKit
-    - name: ls
-      run: ls
+
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
