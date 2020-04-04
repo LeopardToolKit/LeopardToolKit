@@ -5,7 +5,7 @@ using System;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class ServiceCollectionExtension
+    public static partial class ServiceCollectionExtension
     {
         public static IServiceCollection AddEmailSender(this IServiceCollection services, Action<EmailOption> configBuilder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
         {
