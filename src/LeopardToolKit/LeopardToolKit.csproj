@@ -3,6 +3,17 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
      <Version>1.0.1</Version>
+     <Description>The toolkit for .net core</Description>
+     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+     <PackageProjectUrl>https://github.com/LeopardToolKit/LeopardToolKit</PackageProjectUrl>
+     <RepositoryUrl>https://github.com/LeopardToolKit/LeopardToolKit</RepositoryUrl>
+     <RepositoryType>Git</RepositoryType>
+     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MailKit" Version="2.6.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.3" />
+  </ItemGroup>
 
 </Project>
