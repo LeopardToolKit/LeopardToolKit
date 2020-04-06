@@ -26,6 +26,7 @@ namespace Leopard.Locker.Test
         }
 
         [TestMethod]
+        [Ignore]
         public void ProcessLockDifferentLockNameTest()
         {
             ILockFactory processLockFactory = Init("Process").GetRequiredService<ILockFactory>();
@@ -103,6 +104,7 @@ namespace Leopard.Locker.Test
         }
 
         [TestMethod]
+        [Ignore]
         public async Task ProcessLockDifferentLockNameTestAsync()
         {
             ILockFactory processLockFactory = Init("Process").GetRequiredService<ILockFactory>();
