@@ -12,7 +12,7 @@ namespace LeopardToolKit.Office
 {
     public class NPOIOffice : IOffice
     {
-        public void ExportToExcel<T>(IEnumerable<T> data, string fullPath, ExcelOption excelOption)
+        public void ExportToExcel<T>(IEnumerable<T> data, string fullPath, ExcelOption excelOption = null)
         {
             data.ThrowIfNull(nameof(data));
             fullPath.ThrowIfNull(nameof(fullPath));
@@ -21,18 +21,46 @@ namespace LeopardToolKit.Office
 
             List<T> list = data.ToList();
 
-            IWorkbook workbook = null;
+            IWorkbook workbook;
             if (fullPath.EndsWith("xlsx", StringComparison.OrdinalIgnoreCase))
             {
-                workbook = new XSSFWorkbook();
+                if (File.Exists(fullPath))
+                {
+                    workbook = new XSSFWorkbook(new FileStream(fullPath, FileMode.OpenOrCreate));
+                }
+                else
+                {
+                    workbook = new XSSFWorkbook();
+                }
+                
             }
             else
             {
-                workbook = new HSSFWorkbook();
+                if (File.Exists(fullPath))
+                {
+                    workbook = new HSSFWorkbook(new FileStream(fullPath, FileMode.OpenOrCreate));
+                }
+                else
+                {
+                    workbook = new HSSFWorkbook();
+                }
             }
-            ISheet tableSheet = workbook.CreateSheet(excelOption.SheetName.IsEmpty() ? "sheet1" : excelOption.SheetName);
+            ISheet exportSheet;
+            string sheetName = excelOption.SheetName.IsEmpty() ? "sheet1" : excelOption.SheetName;
+            for (int i = 0; i < workbook.NumberOfSheets; i++)
+            {
+                ISheet sheet = workbook.GetSheetAt(i);
+                if(sheet.SheetName == sheetName)
+                {
+                    workbook.RemoveSheetAt(i);
+                    break;
+                }
+            }
+            exportSheet = workbook.CreateSheet(sheetName);
+            
+            
             //Header
-            IRow row = tableSheet.CreateRow(0);
+            IRow row = exportSheet.CreateRow(0);
 
             PropertyInfo[] propertyInfos = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
             for (int i = 0; i < propertyInfos.Length; i++)
@@ -46,7 +74,7 @@ namespace LeopardToolKit.Office
             for (int i = 0; i < list.Count; i++)
             {
                 T t = list[i];
-                IRow sheetRow = tableSheet.CreateRow(i+1);
+                IRow sheetRow = exportSheet.CreateRow(i+1);
                 for (int j = 0; j < propertyInfos.Length; j++)
                 {
                     object cellValue = propertyInfos[j].GetValue(t);
@@ -64,13 +92,13 @@ namespace LeopardToolKit.Office
 
             for (int i = 0; i < propertyInfos.Length; i++)
             {
-                tableSheet.AutoSizeColumn(i);
+                exportSheet.AutoSizeColumn(i);
             }
             using (FileStream fileStream = new FileStream(fullPath, FileMode.OpenOrCreate))
             {
                 workbook.Write(fileStream);
-                fileStream.Flush();
             }
+            workbook?.Close();
         }
 
         public List<T> ImportFromExcel<T>(string fullPath)

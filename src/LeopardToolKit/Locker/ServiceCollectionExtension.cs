@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Leopard.Locker
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static partial class ServiceCollectionExtension
     {
