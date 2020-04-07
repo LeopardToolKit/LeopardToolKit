@@ -12,15 +12,16 @@ namespace LeopardToolKit.Office
 {
     public class NPOIOffice : IOffice
     {
-        public void ExportToExcel<T>(IEnumerable<T> data, string fullPath, ExcelOption excelOption = null)
+        public void ExportToExcel<T>(IEnumerable<T> data, string fullPath, ExportOption exportOption = null)
         {
             data.ThrowIfNull(nameof(data));
             fullPath.ThrowIfNull(nameof(fullPath));
 
-            excelOption = excelOption ?? new ExcelOption();
+            exportOption = exportOption ?? new ExportOption();
 
             List<T> list = data.ToList();
 
+            #region create workbook
             IWorkbook workbook;
             if (fullPath.EndsWith("xlsx", StringComparison.OrdinalIgnoreCase))
             {
@@ -45,8 +46,11 @@ namespace LeopardToolKit.Office
                     workbook = new HSSFWorkbook();
                 }
             }
+            #endregion
+
+            #region create sheet
             ISheet exportSheet;
-            string sheetName = excelOption.SheetName.IsEmpty() ? "sheet1" : excelOption.SheetName;
+            string sheetName = exportOption.SheetName.IsEmpty() ? "sheet1" : exportOption.SheetName;
             for (int i = 0; i < workbook.NumberOfSheets; i++)
             {
                 ISheet sheet = workbook.GetSheetAt(i);
@@ -57,11 +61,10 @@ namespace LeopardToolKit.Office
                 }
             }
             exportSheet = workbook.CreateSheet(sheetName);
-            
-            
-            //Header
-            IRow row = exportSheet.CreateRow(0);
+            #endregion
 
+            #region create header
+            IRow row = exportSheet.CreateRow(0);
             PropertyInfo[] propertyInfos = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
             for (int i = 0; i < propertyInfos.Length; i++)
             {
@@ -70,7 +73,9 @@ namespace LeopardToolKit.Office
                 var headerAttr = prop.GetCustomAttribute<ExcelHeaderAttribute>();
                 cell.SetCellValue(headerAttr?.Name ?? prop.Name);
             }
+            #endregion
 
+            #region export data
             for (int i = 0; i < list.Count; i++)
             {
                 T t = list[i];
@@ -89,6 +94,7 @@ namespace LeopardToolKit.Office
                     }
                 }
             }
+            #endregion
 
             for (int i = 0; i < propertyInfos.Length; i++)
             {
@@ -101,9 +107,177 @@ namespace LeopardToolKit.Office
             workbook?.Close();
         }
 
-        public List<T> ImportFromExcel<T>(string fullPath)
+        public List<T> ImportFromExcel<T>(string fullPath, ImportOption importOption = null) where T : new()
         {
-            throw new NotImplementedException();
+            fullPath.ThrowIfNull(nameof(fullPath));
+
+            if (!File.Exists(fullPath))
+            {
+                throw new FileNotFoundException($"The {fullPath} is not found", fullPath);
+            }
+
+            importOption = importOption ?? new ImportOption();
+
+            #region create workbook
+            IWorkbook workbook;
+            if (fullPath.EndsWith("xlsx", StringComparison.OrdinalIgnoreCase))
+            {
+                workbook = new XSSFWorkbook(new FileStream(fullPath, FileMode.Open));
+            }
+            else
+            {
+                workbook = new HSSFWorkbook(new FileStream(fullPath, FileMode.Open));
+            }
+            #endregion
+
+            #region create sheet
+            ISheet importSheet;
+            if (importOption.SheetName.IsEmpty())
+            {
+                importSheet = workbook.GetSheetAt(importOption.SheetIndex);
+                if (importSheet == null)
+                {
+                    throw new Exception($"Not found sheet with index '0'");
+                }
+            }
+            else
+            {
+                importSheet = workbook.GetSheet(importOption.SheetName);
+                if (importSheet == null)
+                {
+                    throw new Exception($"Not found sheet with name '{importOption.SheetName}'");
+                }
+            }
+            #endregion
+            PropertyInfo[] propertyInfos = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            Dictionary<PropertyInfo, int> propertyMap = new Dictionary<PropertyInfo, int>();
+            IRow headerRow = importSheet.GetRow(0);
+            for (int i = 0; i < headerRow.LastCellNum; i++)
+            {
+                ICell cell = headerRow.GetCell(i);
+                string columnName = cell.StringCellValue;
+                columnName.ThrowIfNull(nameof(columnName));
+                foreach (var prop in propertyInfos)
+                {
+                    var headerAttr = prop.GetCustomAttribute<ExcelHeaderAttribute>();
+                    if(columnName == prop.Name || columnName == headerAttr?.Name)
+                    {
+                        propertyMap[prop] = i;
+                        break;
+                    }
+                }
+            }
+
+            List<T> result = new List<T>();
+            for (int i = (importSheet.FirstRowNum + 1); i <= importSheet.LastRowNum; i++)
+            {
+                IRow row = importSheet.GetRow(i);
+                T t = new T();
+
+                foreach (var prop in propertyInfos)
+                {
+                    ICell cell = row.GetCell(propertyMap[prop]);
+                    var value = ChangeType(cell.StringCellValue, prop.PropertyType);
+                    if(value != null)
+                    {
+                        prop.SetValue(t, value);
+                    }
+                }
+
+                result.Add(t);
+            }
+            workbook?.Close();
+            return result;
+        }
+
+        private object ChangeType(string cellStringValue, Type type)
+        {
+            if(cellStringValue == null)
+            {
+                return null;
+            }
+            if (type.Name == typeof(Nullable<>).Name)
+            {
+                type = type.GenericTypeArguments[0];
+            }
+            if (type == typeof(string))
+            {
+                return cellStringValue;
+            }
+            if (type == typeof(DateTime))
+            {
+                DateTime.TryParse(cellStringValue, out var value);
+                return value;
+            }
+            if (type == typeof(DateTimeOffset))
+            {
+                DateTimeOffset.TryParse(cellStringValue, out var value);
+                return value;
+            }
+            if (type == typeof(TimeSpan))
+            {
+                TimeSpan.TryParse(cellStringValue, out var value);
+                return value;
+            }
+            if (type == typeof(Guid))
+            {
+                Guid.TryParse(cellStringValue, out var value);
+                return value;
+            }
+            if (type == typeof(long))
+            {
+                long.TryParse(cellStringValue, out var value);
+                return value;
+            }
+            if (type == typeof(ulong))
+            {
+                ulong.TryParse(cellStringValue, out var value);
+                return value;
+            }
+            if (type == typeof(int))
+            {
+                int.TryParse(cellStringValue, out var value);
+                return value;
+            }
+            if (type == typeof(uint))
+            {
+                uint.TryParse(cellStringValue, out var value);
+                return value;
+            }
+            if (type == typeof(short))
+            {
+                short.TryParse(cellStringValue, out var value);
+                return value;
+            }
+            if (type == typeof(ushort))
+            {
+                ushort.TryParse(cellStringValue, out var value);
+                return value;
+            }
+            if (type == typeof(byte))
+            {
+                byte.TryParse(cellStringValue, out var value);
+                return value;
+            }
+            if (type == typeof(double))
+            {
+                double.TryParse(cellStringValue, out var value);
+                return value;
+            }
+            if (type == typeof(float))
+            {
+                float.TryParse(cellStringValue, out var value);
+                return value;
+            }
+            if (type == typeof(decimal))
+            {
+                decimal.TryParse(cellStringValue, out var value);
+                return value;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

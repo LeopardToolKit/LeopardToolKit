@@ -6,8 +6,8 @@ namespace LeopardToolKit.Office
 {
     public interface IOffice
     {
-        void ExportToExcel<T>(IEnumerable<T> data, string fullPath, ExcelOption excelOption = null);
+        void ExportToExcel<T>(IEnumerable<T> data, string fullPath, ExportOption exportOption = null);
 
-        List<T> ImportFromExcel<T>(string fullPath);
+        List<T> ImportFromExcel<T>(string fullPath, ImportOption importOption = null) where T : new();
     }
 }

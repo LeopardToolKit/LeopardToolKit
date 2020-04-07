@@ -4,7 +4,7 @@ using System.Text;
 
 namespace LeopardToolKit.Office
 {
-    public class ExcelOption
+    public class ExportOption
     {
         public string SheetName { get; set; }
     }

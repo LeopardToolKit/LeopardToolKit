@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace LeopardToolKit.Test
@@ -19,8 +20,20 @@ namespace LeopardToolKit.Test
             IServiceProvider serviceProvider = services.BuildServiceProvider();
             IOffice office = serviceProvider.GetRequiredService<IOffice>();
             string fileName = Guid.NewGuid().ToString();
-            office.ExportToExcel(GetDemoDatas(), $"{fileName}.xlsx",new ExcelOption() { SheetName="sheet3" });
+            office.ExportToExcel(GetDemoDatas(), $"{fileName}.xlsx",new ExportOption() { SheetName="sheet3" });
             Assert.IsTrue(File.Exists($"{fileName}.xlsx"));
+        }
+
+        [TestMethod]
+        public void TestNpoiExcelImport()
+        {
+            ServiceCollection services = new ServiceCollection();
+            services.AddNpoiOffice();
+            IServiceProvider serviceProvider = services.BuildServiceProvider();
+            IOffice office = serviceProvider.GetRequiredService<IOffice>();
+            var result =office.ImportFromExcel<DemoData>("test.xlsx");
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.Any());
         }
 
         private List<DemoData> GetDemoDatas()
@@ -37,6 +50,6 @@ namespace LeopardToolKit.Test
         public string Name { get; set; }
 
         [ExcelHeader("年龄")]
-        public int Age { get; set; }
+        public int? Age { get; set; }
     }
 }
