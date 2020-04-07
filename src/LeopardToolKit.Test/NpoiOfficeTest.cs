@@ -31,7 +31,9 @@ namespace LeopardToolKit.Test
             services.AddNpoiOffice();
             IServiceProvider serviceProvider = services.BuildServiceProvider();
             IOffice office = serviceProvider.GetRequiredService<IOffice>();
-            var result =office.ImportFromExcel<DemoData>("test.xlsx");
+            string fileName = Guid.NewGuid().ToString();
+            office.ExportToExcel(GetDemoDatas(), $"{fileName}.xlsx", new ExportOption() { SheetName = "sheet3" });
+            var result =office.ImportFromExcel<DemoData>($"{fileName}.xlsx");
             Assert.IsNotNull(result);
             Assert.IsTrue(result.Any());
         }
