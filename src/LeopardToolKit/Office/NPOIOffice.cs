@@ -48,6 +48,23 @@ namespace LeopardToolKit.Office
             }
             #endregion
 
+            #region cell style
+            Dictionary<Type, ICellStyle> cellStyles = new Dictionary<Type, ICellStyle>();
+            IDataFormat dataFormat = workbook.CreateDataFormat();
+
+            ICellStyle dateTimeCellStyle = workbook.CreateCellStyle();
+            dateTimeCellStyle.DataFormat = dataFormat.GetFormat(exportOption.DateFormat ?? "yyyy-MM-dd HH:mm:ss");
+            cellStyles[typeof(DateTime)] = dateTimeCellStyle;
+
+            if (!exportOption.NumberFormat.IsEmpty())
+            {
+                ICellStyle doubleCellStyle = workbook.CreateCellStyle();
+                doubleCellStyle.DataFormat = dataFormat.GetFormat(exportOption.NumberFormat);
+                cellStyles[typeof(double)] = doubleCellStyle;
+            }
+
+            #endregion
+
             #region create sheet
             ISheet exportSheet;
             string sheetName = exportOption.SheetName.IsEmpty() ? "sheet1" : exportOption.SheetName;
@@ -90,7 +107,7 @@ namespace LeopardToolKit.Office
                     }
                     else
                     {
-                        cell.SetCellValue(cellValue.ToString());
+                        SetCellValue(cell, cellValue,cellStyles);
                     }
                 }
             }
@@ -177,7 +194,7 @@ namespace LeopardToolKit.Office
                 foreach (var prop in propertyInfos)
                 {
                     ICell cell = row.GetCell(propertyMap[prop]);
-                    var value = ChangeType(cell.StringCellValue, prop.PropertyType);
+                    var value = GetCellValue(cell, prop.PropertyType);
                     if(value != null)
                     {
                         prop.SetValue(t, value);
@@ -190,9 +207,47 @@ namespace LeopardToolKit.Office
             return result;
         }
 
-        private object ChangeType(string cellStringValue, Type type)
+        private object GetCellValue(ICell cell, Type type)
         {
-            if(cellStringValue == null)
+            if (type.Name == typeof(Nullable<>).Name)
+            {
+                type = type.GenericTypeArguments[0];
+            }
+
+
+            if (cell.CellType == CellType.String)
+            {
+                return GetCellValue(cell.StringCellValue, type);
+            }
+            else if(cell.CellType == CellType.Numeric)
+            {
+                if(type == typeof(DateTime))
+                {
+                    return cell.DateCellValue;
+                }
+                else if (type == typeof(DateTimeOffset))
+                {
+                    return (DateTimeOffset)cell.DateCellValue;
+                }
+                else
+                {
+                    return GetCellValue(cell.NumericCellValue.ToString(), type);
+                }
+            }
+            else if (cell.CellType == CellType.Boolean)
+            {
+                return cell.BooleanCellValue;
+                
+            }
+            else
+            {
+                return GetCellValue(cell.StringCellValue, type);
+            }
+        }
+
+        private object GetCellValue(string cellStringValue, Type type)
+        {
+            if (cellStringValue == null)
             {
                 return null;
             }
@@ -277,6 +332,44 @@ namespace LeopardToolKit.Office
             else
             {
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// https://blog.csdn.net/oYuHuaChen/article/details/82109773
+        /// </summary>
+        /// <param name="cell"></param>
+        /// <param name="value"></param>
+        /// <param name="cellStyles"></param>
+        private void SetCellValue(ICell cell, object value, Dictionary<Type, ICellStyle> cellStyles)
+        {
+            if (value.GetType() == typeof(double))
+            {
+                if (cellStyles.TryGetValue(typeof(double), out var style))
+                {
+                    cell.CellStyle = style;
+                }
+                cell.SetCellValue((double)value);
+            }
+            else if (value.GetType() == typeof(int))
+            {
+                cell.SetCellValue(double.Parse(value.ToString()));
+            }
+            else if(value.GetType() == typeof(DateTime) || value.GetType() == typeof(DateTimeOffset))
+            {
+                if (cellStyles.TryGetValue(typeof(DateTime), out var style))
+                {
+                    cell.CellStyle = style;
+                }
+                cell.SetCellValue(((DateTimeOffset)value).DateTime);
+            }
+            else if (value.GetType() == typeof(bool))
+            {
+                cell.SetCellValue((bool)value);
+            }
+            else
+            {
+                cell.SetCellValue(value.ToString());
             }
         }
     }

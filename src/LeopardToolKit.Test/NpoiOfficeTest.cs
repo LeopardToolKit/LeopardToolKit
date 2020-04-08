@@ -41,8 +41,8 @@ namespace LeopardToolKit.Test
         private List<DemoData> GetDemoDatas()
         {
             List<DemoData> demoDatas = new List<DemoData>();
-            demoDatas.Add(new DemoData() { Name = "Foo", Age = 20 });
-            demoDatas.Add(new DemoData() { Name = "Bar", Age = 21 });
+            demoDatas.Add(new DemoData() { Name = "Foo", Age = 20,DateTime = DateTimeOffset.Now  });
+            demoDatas.Add(new DemoData() { Name = "Bar", Age = 21, DateTime = DateTimeOffset.Now });
             return demoDatas;
         }
     }
@@ -53,5 +53,7 @@ namespace LeopardToolKit.Test
 
         [ExcelHeader("年龄")]
         public int? Age { get; set; }
+
+        public DateTimeOffset DateTime { get; set; }
     }
 }
