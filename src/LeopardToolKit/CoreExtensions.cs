@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Reflection;
 
 namespace LeopardToolKit
@@ -18,6 +19,16 @@ namespace LeopardToolKit
         public static bool IsEmpty(this string str)
         {
             return string.IsNullOrEmpty(str) || string.IsNullOrWhiteSpace(str);
+        }
+
+        public static string ToNewtonsoftJson(this object obj, JsonSerializerSettings settings = null)
+        {
+            return JsonConvert.SerializeObject(obj, settings);
+        }
+
+        public static T DeserializeFromJson<T>(this string value, JsonSerializerSettings settings = null)
+        {
+            return JsonConvert.DeserializeObject<T>(value, settings);
         }
     }
 }
