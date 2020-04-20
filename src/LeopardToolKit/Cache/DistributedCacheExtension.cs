@@ -27,7 +27,7 @@ namespace Microsoft.Extensions.Caching.Distributed
             }
         }
 
-        public static T GetOrSet<T>(this IDistributedCache distributedCache, string key, Func<T> valueGetter, TimeSpan? absoluteExpirationRelativeToNow = default, JsonSerializerSettings serializerSettings)
+        public static T GetOrSet<T>(this IDistributedCache distributedCache, string key, Func<T> valueGetter, TimeSpan? absoluteExpirationRelativeToNow = default, JsonSerializerSettings serializerSettings=default)
         {
             serializerSettings = serializerSettings ?? IgnoreSerializerSettings;
             var valueString = distributedCache.GetString(key);
