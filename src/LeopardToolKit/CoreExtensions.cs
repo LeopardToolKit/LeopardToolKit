@@ -1,5 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using LeopardToolKit.Collection;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace LeopardToolKit
@@ -29,6 +32,11 @@ namespace LeopardToolKit
         public static T DeserializeFromJson<T>(this string value, JsonSerializerSettings settings = null)
         {
             return JsonConvert.DeserializeObject<T>(value, settings);
+        }
+
+        public static IEnumerable<T> Distinct<T>(IEnumerable<T> collection, Func<T, T, bool> comparer)
+        {
+             return collection.Distinct(new DynamicEqualityComparer<T>(comparer));
         }
     }
 }
