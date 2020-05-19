@@ -9,6 +9,12 @@ namespace LeopardToolKit
 {
     public static class CoreExtensions
     {
+        private static JsonSerializerSettings IgnoreSerializerSettings =
+    new JsonSerializerSettings()
+    {
+        NullValueHandling = NullValueHandling.Ignore,
+        DefaultValueHandling = DefaultValueHandling.Ignore
+    };
         public static T ThrowIfNull<T>(this T obj, string objName)
         {
             if (typeof(T).GetTypeInfo().IsValueType || null != obj)
@@ -26,7 +32,7 @@ namespace LeopardToolKit
 
         public static string ToNewtonsoftJson(this object obj, JsonSerializerSettings settings = null)
         {
-            return JsonConvert.SerializeObject(obj, settings);
+            return JsonConvert.SerializeObject(obj, settings ?? IgnoreSerializerSettings);
         }
 
         public static T DeserializeFromJson<T>(this string value, JsonSerializerSettings settings = null)
