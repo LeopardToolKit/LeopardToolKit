@@ -18,7 +18,8 @@ namespace LeopardToolKit.Cache
         /// </summary>
         /// <param name="key">The key for the object.</param>
         /// <param name="value">The value to store.</param>
-        void Put<T>(string key, T value);
+        /// <param name="absoluteExpirationTime"></param>
+        void Put<T>(string key, T value, TimeSpan absoluteExpirationTime);
 
         /// <summary>
         /// Removes the object associated with the given key.

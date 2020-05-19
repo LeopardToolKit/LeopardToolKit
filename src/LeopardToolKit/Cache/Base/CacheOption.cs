@@ -10,9 +10,11 @@ namespace LeopardToolKit.Cache
 
         public string DefaultCategory { get; set; }
 
-        public List<CacheItemOption> CacheItems { get; set; }
-    }
+        public RedisCacheStoreOption RedisCacheStoreOption { get; set; }
 
+        public List<CacheItemOption> CacheCategory { get; set; }
+    }
+    
     public class CacheItemOption
     {
         public string CacheCategory { get; set; }

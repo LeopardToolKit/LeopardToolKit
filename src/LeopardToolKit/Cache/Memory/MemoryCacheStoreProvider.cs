@@ -5,17 +5,18 @@ using System.Text;
 
 namespace LeopardToolKit.Cache
 {
-    public class MemoryDataStoreProvider : ICacheStoreProvider
+    [CacheProviderAlias("MemoryCache")]
+    public class MemoryCacheStoreProvider : ICacheStoreProvider
     {
-        private static readonly ConcurrentDictionary<string, MemoryDataStore> s_registrations = new ConcurrentDictionary<string, MemoryDataStore>();
+        private static readonly ConcurrentDictionary<string, MemoryCacheStore> s_registrations = new ConcurrentDictionary<string, MemoryCacheStore>();
 
         public ICacheStore CreateDataStore(string name)
         {
             name.ThrowIfNull(nameof(name));
-            MemoryDataStore dataStore;
+            MemoryCacheStore dataStore;
             if (!s_registrations.TryGetValue(name, out dataStore))
             {
-                dataStore = new MemoryDataStore();
+                dataStore = new MemoryCacheStore();
                 if (!s_registrations.TryAdd(name, dataStore))
                 {
                     throw new InvalidOperationException("The specified memory data store could not be created.");

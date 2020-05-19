@@ -15,14 +15,15 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static void AddCacheOfMemory(this IServiceCollection services, IConfiguration configuration)
         {
-            AddCache(services, configuration);
-        }
-
-
-        private static void AddCache(this IServiceCollection services, IConfiguration configuration)
-        {
-            services.Configure<LeopardToolKit.Cache.CacheOption>(configuration);
+            configuration.ThrowIfNull(nameof(configuration));
+            services.Configure<CacheOption>(configuration);
             services.AddSingleton<ICacheStoreFactory, CacheStoreFactory>();
+            if (configuration.GetSection("RedisCacheStoreOption") != null)
+            {
+                services.Configure<RedisCacheStoreOption>(configuration.GetSection("RedisCacheStoreOption"));
+                services.TryAddEnumerable(ServiceDescriptor.Singleton<ICacheStoreProvider, RedisCacheStoreProvider>());
+            }
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ICacheStoreProvider, MemoryCacheStoreProvider>());
         }
     }
 }

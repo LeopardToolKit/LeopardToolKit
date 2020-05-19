@@ -36,7 +36,7 @@ namespace LeopardToolKit.Cache
             categoryName = categoryName ?? this.cacheOption.DefaultCategory;
             categoryName.ThrowIfNull(nameof(categoryName));
 
-            var cacheItem = this.cacheOption.CacheItems.FirstOrDefault(i => i.CacheCategory == categoryName);
+            var cacheItem = this.cacheOption.CacheCategory.FirstOrDefault(i => i.CacheCategory == categoryName);
             var providerType = cacheItem?.ProviderType;
             if (providerType.IsEmpty())
             {
