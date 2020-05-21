@@ -1,29 +1,17 @@
-﻿using LeopardToolKit;
-using LeopardToolKit.Cache;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Newtonsoft.Json;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Text;
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace LeopardToolKit.Cache
 {
-    public static partial class ServiceCollectionExtension
+    public static class ServiceCollectionExtension
     {
-        public static void AddCacheOfMemory(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddCache(this IServiceCollection services, Action<CacheBuilder> builder)
         {
-            configuration.ThrowIfNull(nameof(configuration));
-            services.Configure<CacheOption>(configuration);
-            services.AddSingleton<ICacheStoreFactory, CacheStoreFactory>();
-            if (configuration.GetSection("RedisCacheStoreOption") != null)
-            {
-                services.Configure<RedisCacheStoreOption>(configuration.GetSection("RedisCacheStoreOption"));
-                services.TryAddEnumerable(ServiceDescriptor.Singleton<ICacheStoreProvider, RedisCacheStoreProvider>());
-            }
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<ICacheStoreProvider, MemoryCacheStoreProvider>());
+            var cacheBuilder = new CacheBuilder(services);
+            builder.Invoke(cacheBuilder);
+            return services;
         }
     }
 }

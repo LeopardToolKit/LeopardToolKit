@@ -5,21 +5,21 @@ using System.Text;
 
 namespace LeopardToolKit.Cache
 {
-    [CacheProviderAlias("RedisCache")]
-    public class RedisCacheStoreProvider : ICacheStoreProvider
+    [CacheProviderAlias("Redis")]
+    public class RedisCacheProvider : ICacheProvider
     {
         private readonly RedisDB redisDB;
         private readonly int cacheIndex;
 
-        public RedisCacheStoreProvider(IOptions<RedisCacheStoreOption> options)
+        public RedisCacheProvider(IOptions<RedisCacheOption> options)
         {
             this.redisDB = new RedisDB(options.Value.RedisConnection);
             this.cacheIndex = options.Value.DataBaseIndex;
         }
 
-        public ICacheStore CreateDataStore(string name)
+        public ICache CreateCache(string name)
         {
-            return new RedisCacheStore(this.redisDB, name, cacheIndex);
+            return new RedisCache(this.redisDB, name, cacheIndex);
         }
     }
 }

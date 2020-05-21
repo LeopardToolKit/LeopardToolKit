@@ -4,7 +4,7 @@ using System.Text;
 
 namespace LeopardToolKit.Cache
 {
-    public class RedisCacheStoreOption
+    public class RedisCacheOption
     {
         public string RedisConnection { get; set; }
 

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace LeopardToolKit.Cache
 {
-    public interface ICacheStore
+    public interface ICache
     {
         /// <summary>
         /// Gets an item from the cache

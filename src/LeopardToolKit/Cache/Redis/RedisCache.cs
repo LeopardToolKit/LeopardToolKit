@@ -4,13 +4,13 @@ using System.Text;
 
 namespace LeopardToolKit.Cache
 {
-    public class RedisCacheStore : ICacheStore
+    public class RedisCache : ICache
     {
         private readonly RedisDB redisDB;
         private readonly string categoryName;
         private readonly int cacheDataBaseIndex;
 
-        public RedisCacheStore(RedisDB redisDB, string categoryName, int cacheDataBaseIndex)
+        public RedisCache(RedisDB redisDB, string categoryName, int cacheDataBaseIndex)
         {
             this.redisDB = redisDB;
             this.categoryName = categoryName;

@@ -5,6 +5,7 @@ using System.Text;
 
 namespace LeopardToolKit.Cache
 {
+    [AttributeUsage(AttributeTargets.Class)]
     public class CacheProviderAliasAttribute : Attribute
     {
         public string Name { get; set; }

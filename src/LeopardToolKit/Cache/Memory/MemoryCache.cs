@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace LeopardToolKit.Cache
 {
-    public class MemoryCacheStore : ICacheStore
+    public class MemoryCache : ICache
     {
         private readonly ConcurrentDictionary<string, CacheItem> _store = new ConcurrentDictionary<string, CacheItem>();
 
@@ -65,7 +65,7 @@ namespace LeopardToolKit.Cache
 
         private DateTimeOffset lastScanTime = DateTimeOffset.Now;
 
-        private void ScanForExpiredItems(MemoryCacheStore memoryCacheStore)
+        private void ScanForExpiredItems(MemoryCache memoryCacheStore)
         {
             if (memoryCacheStore.lastScanTime.AddMinutes(1) < DateTimeOffset.Now)
             {
@@ -73,7 +73,7 @@ namespace LeopardToolKit.Cache
                 Task.Factory.StartNew(state =>
                 {
                     List<string> removingKeys = new List<string>();
-                    MemoryCacheStore cacheStore = (MemoryCacheStore)state;
+                    MemoryCache cacheStore = (MemoryCache)state;
                     foreach (var kvp in cacheStore._store.ToList())
                     {
                         if(kvp.Value.ExpirationTime < DateTimeOffset.Now)
