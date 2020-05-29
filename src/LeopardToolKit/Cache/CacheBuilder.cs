@@ -25,26 +25,26 @@ namespace LeopardToolKit.Cache
             return cacheBuilder;
         }
 
-        public static CacheBuilder AddMemory(this CacheBuilder cacheBuilder)
+        public static CacheBuilder AddMemoryProvider(this CacheBuilder cacheBuilder)
         {
             cacheBuilder.AddCache();
-            cacheBuilder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ICacheProvider, MemoryCacheProvider>());
+            cacheBuilder.AddCacheProvider<MemoryCacheProvider>();
             return cacheBuilder;
         }
 
-        public static CacheBuilder AddRedis(this CacheBuilder cacheBuilder, Action<RedisCacheOption> optionBuilder)
+        public static CacheBuilder AddRedisProvider(this CacheBuilder cacheBuilder, Action<RedisCacheOption> optionBuilder)
         {
             cacheBuilder.AddCache();
             cacheBuilder.Services.Configure(optionBuilder);
-            cacheBuilder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ICacheProvider, RedisCacheProvider>());
+            cacheBuilder.AddCacheProvider<RedisCacheProvider>();
             return cacheBuilder;
         }
 
-        public static CacheBuilder AddRedis(this CacheBuilder cacheBuilder, IConfiguration configuration)
+        public static CacheBuilder AddRedisProvider(this CacheBuilder cacheBuilder, IConfiguration configuration)
         {
             cacheBuilder.AddCache();
             cacheBuilder.Services.Configure<RedisCacheOption>(configuration);
-            cacheBuilder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ICacheProvider, RedisCacheProvider>());
+            cacheBuilder.AddCacheProvider<RedisCacheProvider>();
             return cacheBuilder;
         }
 
@@ -66,7 +66,7 @@ namespace LeopardToolKit.Cache
             where TCacheProvider : ICacheProvider
         {
             cacheBuilder.AddCache();
-            cacheBuilder.Services.TryAddSingleton(typeof(ICacheProvider), typeof(TCacheProvider)); ;
+            cacheBuilder.Services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(ICacheProvider), typeof(TCacheProvider)));
             return cacheBuilder;
         }
 
@@ -74,7 +74,7 @@ namespace LeopardToolKit.Cache
             where TCacheProvider : ICacheProvider
         {
             cacheBuilder.AddCache();
-            cacheBuilder.Services.TryAddSingleton<ICacheProvider>(cacheProvider);
+            cacheBuilder.Services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(ICacheProvider), cacheProvider));
             return cacheBuilder;
         }
     }
