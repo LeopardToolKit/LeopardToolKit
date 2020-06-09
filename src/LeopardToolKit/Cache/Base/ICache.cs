@@ -26,5 +26,10 @@ namespace LeopardToolKit.Cache
         /// </summary>
         /// <param name="key">The key for the object.</param>
         void Remove(string key);
+
+        /// <summary>
+        /// Category name for this cache
+        /// </summary>
+        string CategoryName { get; }
     }
 }

@@ -10,8 +10,13 @@ namespace LeopardToolKit.Cache
 
         public Cache(ICacheFactory cacheFactory)
         {
-            this.cache = cacheFactory.CreateCache(typeof(TCategory).FullName);
+            this.CategoryName = typeof(TCategory).FullName;
+            this.cache = cacheFactory.CreateCache(this.CategoryName);
+            
         }
+
+        public string CategoryName { get; }
+
         public T Get<T>(string key)
         {
             return this.cache.Get<T>(key);

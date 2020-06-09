@@ -9,8 +9,8 @@ namespace LeopardToolKit.Cache
         /// <summary>
         /// Creates a data store.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="categoryName"></param>
         /// <returns><see cref="ICache"/> if successfull, otherwise null.</returns>
-        ICache CreateCache(string name);
+        ICache CreateCache(string categoryName);
     }
 }

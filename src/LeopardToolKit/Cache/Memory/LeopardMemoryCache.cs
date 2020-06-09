@@ -13,7 +13,15 @@ namespace LeopardToolKit.Cache
 {
     public class LeopardMemoryCache : ICache
     {
-        private readonly MemoryCache _store = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+        private readonly MemoryCache _store;
+
+        public LeopardMemoryCache(IOptions<MemoryCacheOptions> optionsAccessor, string categoryName)
+        {
+            _store = new MemoryCache(optionsAccessor);
+            this.CategoryName = categoryName;
+        }
+
+        public string CategoryName { get; }
 
         public T Get<T>(string key)
         {

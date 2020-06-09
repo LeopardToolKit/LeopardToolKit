@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
@@ -25,10 +26,23 @@ namespace LeopardToolKit.Cache
             return cacheBuilder;
         }
 
-        public static CacheBuilder AddMemoryProvider(this CacheBuilder cacheBuilder)
+        public static CacheBuilder AddMemoryProvider(this CacheBuilder cacheBuilder, Action<MemoryCacheOptions> setupAction = null)
         {
             cacheBuilder.AddCache();
             cacheBuilder.AddCacheProvider<MemoryCacheProvider>();
+            if (setupAction == null)
+            {
+                setupAction = option => { };
+            }
+            cacheBuilder.Services.Configure(setupAction);
+            return cacheBuilder;
+        }
+
+        public static CacheBuilder AddMemoryProvider(this CacheBuilder cacheBuilder, IConfiguration configuration)
+        {
+            cacheBuilder.AddCache();
+            cacheBuilder.AddCacheProvider<MemoryCacheProvider>();
+            cacheBuilder.Services.Configure<MemoryCacheOptions>(configuration);
             return cacheBuilder;
         }
 
