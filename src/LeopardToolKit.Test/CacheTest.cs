@@ -14,7 +14,6 @@ namespace LeopardToolKit.Test
     [TestClass]
     public class CacheTest
     {
-
         [TestMethod]
         public async Task TestCacheDefault()
         {

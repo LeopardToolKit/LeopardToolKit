@@ -8,15 +8,15 @@ namespace LeopardToolKit.Cache
     [CacheProviderAlias("Memory")]
     public class MemoryCacheProvider : ICacheProvider
     {
-        private static readonly ConcurrentDictionary<string, MemoryCache> s_registrations = new ConcurrentDictionary<string, MemoryCache>();
+        private static readonly ConcurrentDictionary<string, LeopardMemoryCache> s_registrations = new ConcurrentDictionary<string, LeopardMemoryCache>();
 
         public ICache CreateCache(string name)
         {
             name.ThrowIfNull(nameof(name));
-            MemoryCache dataStore;
+            LeopardMemoryCache dataStore;
             if (!s_registrations.TryGetValue(name, out dataStore))
             {
-                dataStore = new MemoryCache();
+                dataStore = new LeopardMemoryCache();
                 if (!s_registrations.TryAdd(name, dataStore))
                 {
                     throw new InvalidOperationException("The specified memory data store could not be created.");
