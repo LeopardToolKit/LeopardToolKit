@@ -18,6 +18,8 @@ namespace LeopardToolKit.EventBus
         private readonly IServiceProvider serviceProvider;
         private readonly ILogger<MemoryEventDispatcher> logger;
 
+        private bool disposed = false;
+
         internal MemoryEventDispatcher(IServiceProvider serviceProvider, ILogger<MemoryEventDispatcher> logger, ConcurrentDictionary<string, Type> eventHandlerMap)
         {
             this.serviceProvider = serviceProvider;
@@ -27,17 +29,27 @@ namespace LeopardToolKit.EventBus
 
         public void Dispose()
         {
+            if (disposed)
+            {
+                return;
+            }
+            disposed = true;
             cts.Cancel();
         }
 
-        public void EnqueueMessage(string eventName, object eventData)
+        internal void EnqueueMessage(string eventName, object eventData)
         {
             MessageQueue.Enqueue(new EventMessage() { Name = eventName, Data = eventData });
         }
 
-        internal void Start()
+        public void Start()
         {
             Task.Factory.StartNew(Execute, cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+        }
+
+        public void Stop()
+        {
+            Dispose();
         }
 
         private async Task Execute()
