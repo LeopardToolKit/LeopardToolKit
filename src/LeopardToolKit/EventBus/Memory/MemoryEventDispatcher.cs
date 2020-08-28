@@ -13,25 +13,16 @@ namespace LeopardToolKit.EventBus
     public class MemoryEventDispatcher : IDisposable
     {
         private readonly CancellationTokenSource cts = new CancellationTokenSource();
-        private readonly ConcurrentDictionary<string, Type> EventHandlerMap = new ConcurrentDictionary<string, Type>();
+        private readonly ConcurrentDictionary<string, Type> EventHandlerMap;
         private readonly ConcurrentQueue<EventMessage> MessageQueue = new ConcurrentQueue<EventMessage>();
         private readonly IServiceProvider serviceProvider;
         private readonly ILogger<MemoryEventDispatcher> logger;
 
-        public MemoryEventDispatcher(IServiceProvider serviceProvider, ILogger<MemoryEventDispatcher> logger)
+        internal MemoryEventDispatcher(IServiceProvider serviceProvider, ILogger<MemoryEventDispatcher> logger, ConcurrentDictionary<string, Type> eventHandlerMap)
         {
             this.serviceProvider = serviceProvider;
             this.logger = logger;
-            var assemblyTypes = AppDomain.CurrentDomain.GetAssemblies();
-            using (var scope = this.serviceProvider.CreateScope())
-            {
-                foreach (var handlerType in assemblyTypes.SelectMany(ass => ass.GetTypes().Where(type => type.IsClass && typeof(IEventHandler).IsAssignableFrom(type))))
-                {
-                    IEventHandler eventHandler = (IEventHandler)scope.ServiceProvider.GetRequiredService(handlerType);
-                    EventHandlerMap.TryAdd(eventHandler.EventName, eventHandler.GetType());
-                }
-
-            }
+            this.EventHandlerMap = eventHandlerMap.ThrowIfNull(nameof(eventHandlerMap));
         }
 
         public void Dispose()
@@ -64,6 +55,7 @@ namespace LeopardToolKit.EventBus
                             using (var scope = this.serviceProvider.CreateScope())
                             {
                                 eventSubcribe = (IEventHandler)scope.ServiceProvider.GetRequiredService(eventHandler);
+                                // Todo: if need run as async
                                 await eventSubcribe.Execute(eventMessage.Data);
                             }
                         }

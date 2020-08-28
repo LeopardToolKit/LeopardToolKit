@@ -7,8 +7,6 @@ namespace LeopardToolKit.EventBus
 {
     public interface IEventHandler
     {
-        string EventName { get; }
-
         Task Execute(object eventData);
 
         void ExceptionCallback(object eventData, Exception exception);
