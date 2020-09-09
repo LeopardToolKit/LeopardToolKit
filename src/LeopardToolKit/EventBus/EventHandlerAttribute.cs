@@ -9,7 +9,7 @@ namespace LeopardToolKit.EventBus
     {
         public string EventName { get; private set; }
 
-        public ServiceLifetime HandlerLifetime { get; set; }
+        public ServiceLifetime HandlerLifetime { get; private set; }
 
         public EventHandlerAttribute(string eventName, ServiceLifetime handlerLifetime = ServiceLifetime.Transient)
         {

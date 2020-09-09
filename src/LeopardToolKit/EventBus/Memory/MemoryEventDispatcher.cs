@@ -68,7 +68,7 @@ namespace LeopardToolKit.EventBus
                             {
                                 eventSubcribe = (IEventHandler)scope.ServiceProvider.GetRequiredService(eventHandler);
                                 // Todo: if need run as async
-                                await eventSubcribe.Execute(eventMessage.Data);
+                                await eventSubcribe.Execute(eventMessage.Data).ConfigureAwait(false);
                             }
                         }
                     }

@@ -23,7 +23,16 @@ namespace Microsoft.Extensions.DependencyInjection
             foreach (var handlerType in handlerAssemblies.SelectMany(assembly => assembly.GetTypes().Where(type => type.IsClass && typeof(IEventHandler).IsAssignableFrom(type))))
             {
                 EventHandlerAttribute eventHandlerAttribute = handlerType.GetCustomAttribute<EventHandlerAttribute>();
-                eventHandlerMap.TryAdd(eventHandlerAttribute.ThrowIfNull(nameof(eventHandlerAttribute)).EventName, handlerType);
+                if(eventHandlerAttribute == null)
+                {
+                    throw new InvalidOperationException($"The type {handlerType.FullName} should have {nameof(EventHandlerAttribute)} attribute");
+                }
+
+                if(!eventHandlerMap.TryAdd(eventHandlerAttribute.ThrowIfNull(nameof(eventHandlerAttribute)).EventName, handlerType))
+                {
+                    throw new InvalidOperationException($"There are duplicate handlers for one event name {eventHandlerAttribute.EventName}");
+                }
+
                 services.Add(new ServiceDescriptor(handlerType, handlerType, eventHandlerAttribute.HandlerLifetime));
             }
 
