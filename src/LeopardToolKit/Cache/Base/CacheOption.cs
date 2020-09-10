@@ -6,7 +6,7 @@ namespace LeopardToolKit.Cache
 {
     public class CacheOption
     {
-        public string DefaultProvider { get; set; } = "Memory";
+        public string DefaultProvider { get; set; }
 
         public List<CacheItemOption> CacheCategory { get; set; }
     }

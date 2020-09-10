@@ -19,7 +19,6 @@ namespace LeopardToolKit.Test
         {
             ServiceCollection services = new ServiceCollection();
             services.AddCache(builder => {
-                builder.AddCache();
                 builder.AddMemoryProvider();
                 builder.AddConfiguration(b => b.DefaultProvider = "Memory");
             });
@@ -41,7 +40,6 @@ namespace LeopardToolKit.Test
         {
             ServiceCollection services = new ServiceCollection();
             services.AddCache(builder => {
-                builder.AddCache();
                 builder.AddMemoryProvider();
                 builder.AddConfiguration(b => b.DefaultProvider = "Memory");
             });
@@ -57,7 +55,6 @@ namespace LeopardToolKit.Test
         {
             ServiceCollection services = new ServiceCollection();
             services.AddCache(builder => {
-                builder.AddCache();
                 builder.AddMemoryProvider();
                 builder.AddConfiguration(b => b.DefaultProvider = "Memory");
             });

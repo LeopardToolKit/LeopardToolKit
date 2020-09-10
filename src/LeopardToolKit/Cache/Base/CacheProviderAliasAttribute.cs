@@ -8,7 +8,7 @@ namespace LeopardToolKit.Cache
     [AttributeUsage(AttributeTargets.Class)]
     public class CacheProviderAliasAttribute : Attribute
     {
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
         public CacheProviderAliasAttribute(string name)
         {

@@ -16,6 +16,7 @@ namespace LeopardToolKit.Cache
         public CacheFactory(IOptions<CacheOption> options, IEnumerable<ICacheProvider> cacheStoreProviders)
         {
             this.cacheOption = options.Value;
+            this.cacheOption.DefaultProvider.ThrowIfNull("DefaultProvider");
             this.providers = new ConcurrentDictionary<string, ICacheProvider>();
             foreach (var provider in cacheStoreProviders)
             {
